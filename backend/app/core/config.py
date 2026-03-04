@@ -35,7 +35,9 @@ def get_settings() -> Settings:
     image_model = os.getenv("LOREFORGE_IMAGE_MODEL", "imagen-4.0-fast-generate-001")
     image_output_mime_type = os.getenv("LOREFORGE_IMAGE_OUTPUT_MIME", "image/jpeg")
     image_aspect_ratio = os.getenv("LOREFORGE_IMAGE_ASPECT_RATIO", "16:9")
-    auto_image_for_scenes = os.getenv("LOREFORGE_AUTO_IMAGE_FOR_SCENES", "1").strip().lower() in (
+    auto_image_for_scenes = os.getenv(
+        "LOREFORGE_AUTO_IMAGE_FOR_SCENES", "1"
+    ).strip().lower() in (
         "1",
         "true",
         "yes",

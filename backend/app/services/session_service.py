@@ -48,7 +48,10 @@ class SessionService:
         }
 
     async def update_state(
-        self, session_id: str, world_state: dict[str, Any] | None, inventory: list[Any] | None
+        self,
+        session_id: str,
+        world_state: dict[str, Any] | None,
+        inventory: list[Any] | None,
     ) -> None:
         try:
             await self.store.update_state(
@@ -88,7 +91,9 @@ class SessionService:
             msg = str(e)
             if msg.lower().strip() == "session not found":
                 raise HTTPException(status_code=404, detail=msg)
-            raise HTTPException(status_code=502, detail=f"State derivation error: {msg}")
+            raise HTTPException(
+                status_code=502, detail=f"State derivation error: {msg}"
+            )
         except Exception as e:
             raise HTTPException(status_code=502, detail=f"State derivation error: {e}")
 

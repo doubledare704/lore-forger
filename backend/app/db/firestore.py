@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from dataclasses import dataclass
 from functools import lru_cache
 from typing import Any
@@ -18,10 +16,6 @@ def get_firestore_client() -> firestore.AsyncClient:
     """
 
     return firestore.AsyncClient()
-
-
-def get_session_store() -> SessionStore:
-    return SessionStore(client=get_firestore_client())
 
 
 @dataclass(slots=True)
@@ -83,10 +77,14 @@ class SessionStore:
         doc_ref = events_col.document()  # auto id
         await doc_ref.set({**event, "created_at": SERVER_TIMESTAMP}, merge=False)
         # touch session
-        await self._session_ref(session_id).set({"updated_at": SERVER_TIMESTAMP}, merge=True)
+        await self._session_ref(session_id).set(
+            {"updated_at": SERVER_TIMESTAMP}, merge=True
+        )
         return doc_ref.id
 
-    async def list_events(self, session_id: str, *, limit: int = 50) -> list[dict[str, Any]]:
+    async def list_events(
+        self, session_id: str, *, limit: int = 50
+    ) -> list[dict[str, Any]]:
         events_col = self._session_ref(session_id).collection("events")
         snaps = (
             events_col.order_by("created_at", direction=firestore.Query.DESCENDING)
@@ -99,3 +97,7 @@ class SessionStore:
             d["event_id"] = s.id
             out.append(d)
         return out
+
+
+def get_session_store() -> SessionStore:
+    return SessionStore(client=get_firestore_client())

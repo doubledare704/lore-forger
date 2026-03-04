@@ -17,7 +17,9 @@ class PresentationStore:
     def _presentations(self) -> firestore.AsyncCollectionReference:
         return self.client.collection(self.collection)
 
-    def _presentation_ref(self, presentation_id: str) -> firestore.AsyncDocumentReference:
+    def _presentation_ref(
+        self, presentation_id: str
+    ) -> firestore.AsyncDocumentReference:
         return self._presentations().document(presentation_id)
 
     def _presentation_images(
@@ -36,18 +38,22 @@ class PresentationStore:
         prompt: str,
         alt: str,
     ) -> None:
-        await self._presentation_images(presentation_id).document(image_id).set(
-            {
-                "image_id": image_id,
-                "presentation_id": presentation_id,
-                "slide_index": slide_index,
-                "mime_type": mime_type,
-                "image_bytes": image_bytes,
-                "prompt": prompt,
-                "alt": alt,
-                "created_at": SERVER_TIMESTAMP,
-            },
-            merge=False,
+        await (
+            self._presentation_images(presentation_id)
+            .document(image_id)
+            .set(
+                {
+                    "image_id": image_id,
+                    "presentation_id": presentation_id,
+                    "slide_index": slide_index,
+                    "mime_type": mime_type,
+                    "image_bytes": image_bytes,
+                    "prompt": prompt,
+                    "alt": alt,
+                    "created_at": SERVER_TIMESTAMP,
+                },
+                merge=False,
+            )
         )
 
     async def get_presentation_image(
@@ -93,7 +99,6 @@ class PresentationStore:
         data = snap.to_dict() or {}
         data.setdefault("presentation_id", presentation_id)
         return data
-
 
     async def list_presentations_for_session(
         self, *, session_id: str, limit: int = 25

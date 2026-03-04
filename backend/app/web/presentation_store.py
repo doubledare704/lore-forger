@@ -31,7 +31,9 @@ class InMemoryPresentationStore:
         self._lock = Lock()
         self._items: dict[str, StoredPresentation] = {}
 
-    def put(self, *, title: str, outline: dict[str, Any], html: str) -> StoredPresentation:
+    def put(
+        self, *, title: str, outline: dict[str, Any], html: str
+    ) -> StoredPresentation:
         now = datetime.now(timezone.utc)
         item = StoredPresentation(
             presentation_id=str(uuid4()),

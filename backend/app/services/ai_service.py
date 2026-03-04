@@ -51,7 +51,8 @@ class AIService:
                     else False
                     if auto_image is False
                     else (
-                        self.settings.auto_image_for_scenes and looks_like_scene_prompt(prompt)
+                        self.settings.auto_image_for_scenes
+                        and looks_like_scene_prompt(prompt)
                     )
                 )
 
@@ -63,7 +64,13 @@ class AIService:
                         prompt=prompt,
                         assistant_text=assistant_text,
                     )
-                    emit({"type": "image", "url": data_url, "alt": "Generated scene image"})
+                    emit(
+                        {
+                            "type": "image",
+                            "url": data_url,
+                            "alt": "Generated scene image",
+                        }
+                    )
             except Exception as e:
                 # Do not fail the whole stream if image generation fails.
                 emit({"type": "error", "message": f"Image generation failed: {e}"})

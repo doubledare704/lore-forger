@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from typing import Any
 from pydantic import BaseModel, Field
 
@@ -10,7 +8,7 @@ class StreamRequest(BaseModel):
         default=None, description="Optional client-provided session id"
     )
 
-    # If None, server may decide (e.g. based on prompt). If true/false, force enable/disable.
+    # If None, the server may decide (e.g., based on prompt). If true/false, force enable/disable.
     auto_image: bool | None = Field(
         default=None,
         description="If true, generate 1 image and emit SSE {type:'image'}; if false, never generate an image.",
@@ -53,7 +51,8 @@ class GeneratePresentationRequest(BaseModel):
         ),
     )
     session_id: str | None = Field(
-        default=None, description="If set, build the deck from Firestore session state/events"
+        default=None,
+        description="If set, build the deck from Firestore session state/events",
     )
     slide_count: int = Field(default=6, ge=3, le=12)
     events_limit: int = Field(default=30, ge=5, le=200)

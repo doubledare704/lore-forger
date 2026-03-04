@@ -1,5 +1,6 @@
 import base64
 import json
+import logging
 import re
 from typing import Any
 
@@ -130,7 +131,11 @@ STATE_DERIVATION_SCHEMA_HINT = {
         ],
         "facts": ["string"],
         "open_questions": ["string"],
-        "next_session": {"objective": "string", "scenes": ["string"], "hooks": ["string"]},
+        "next_session": {
+            "objective": "string",
+            "scenes": ["string"],
+            "hooks": ["string"],
+        },
     },
     "inventory": [
         {
@@ -233,21 +238,15 @@ def generate_scene_image(
     if settings.image_aspect_ratio and settings.image_model.startswith("imagen-4"):
         config["aspect_ratio"] = settings.image_aspect_ratio
 
-    negative_prompt = DEFAULT_NEGATIVE_PROMPT
-
-    # Some Imagen variants support negative_prompt; fall back gracefully if unsupported.
     try:
-        result = client.models.generate_images(
-            model=settings.image_model,
-            prompt=image_prompt,
-            config={**config, "negative_prompt": negative_prompt},
-        )
-    except Exception:
         result = client.models.generate_images(
             model=settings.image_model,
             prompt=image_prompt,
             config=config,
         )
+    except Exception:
+        logging.exception("Error generating image")
+        raise
 
     generated = (getattr(result, "generated_images", None) or [None])[0]
     image_obj = getattr(generated, "image", None) if generated else None
