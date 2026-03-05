@@ -134,18 +134,10 @@ class PresentationService:
 
         mime_type = str(item.get("mime_type") or "application/octet-stream")
         raw = item.get("image_bytes")
-        logging.info(f"{raw} and type {type(raw)}")
-        # Firestore may return bytes or a Blob-like object.
-        if isinstance(raw, bytes):
-            data = raw
-        elif hasattr(raw, "to_bytes"):
-            data = raw.to_bytes()
-        elif hasattr(raw, "bytes"):
-            data = raw.bytes  # type: ignore[attr-defined]
-        else:
+        if not isinstance(raw, bytes):
             raise HTTPException(status_code=500, detail="Invalid image payload")
 
-        return data, mime_type
+        return raw, mime_type
 
     def _ts_to_str(self, v: Any) -> str | None:
         if v is None:
@@ -241,7 +233,7 @@ class PresentationService:
                 ),
                 config=types.GenerateContentConfig(
                     response_mime_type="application/json",
-                    temperature=0.4 if attempt == 0 else 0.0,
+                    temperature=0.2 if attempt == 0 else 0.0,
                     max_output_tokens=3072,
                 ),
             )
@@ -296,14 +288,10 @@ class PresentationService:
                 config: dict = {
                     "number_of_images": 1,
                     "output_mime_type": settings.image_output_mime_type,
+                    "aspect_ratio": settings.image_aspect_ratio,
                 }
-                if settings.image_aspect_ratio and settings.image_model.startswith(
-                    "imagen-4"
-                ):
-                    config["aspect_ratio"] = settings.image_aspect_ratio
-
                 try:
-                    result = await asyncio.to_thread(
+                    result: types.GenerateImagesResponse = await asyncio.to_thread(
                         client.models.generate_images,
                         model=settings.image_model,
                         prompt=image_prompt,
@@ -313,11 +301,9 @@ class PresentationService:
                     logging.exception("Error generating image")
                     raise
 
-                generated = (getattr(result, "generated_images", None) or [None])[0]
-                image_obj = getattr(generated, "image", None) if generated else None
-                image_bytes = (
-                    getattr(image_obj, "image_bytes", None) if image_obj else None
-                )
+                generated = result.generated_images[0] if result.generated_images else None
+                image_obj = generated.image if generated else None
+                image_bytes = image_obj.image_bytes if image_obj else None
                 if not image_bytes:
                     raise RuntimeError("Image model returned no image bytes")
 
@@ -339,11 +325,10 @@ class PresentationService:
                     alt=alt,
                 )
 
-                raw["background_image"] = (
-                    f"/presentations/{presentation_id}/images/{image_id}"
-                )
+                raw["background_image"] = f"/presentations/{presentation_id}/images/{image_id}"
             except Exception:
                 # Best-effort: if any slide image fails, keep generating the deck.
+                logging.exception("Error generating slide image")
                 continue
 
         return outline

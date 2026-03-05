@@ -48,7 +48,6 @@ def looks_like_scene_prompt(prompt: str) -> bool:
 
 def build_image_prompt(*, user_prompt: str, assistant_text: str) -> str:
     """Build a prompt for Imagen from user request and assistant lore."""
-    # Keep it short to reduce failure rate.
     assistant_excerpt = assistant_text.strip().replace("\n", " ")
     if len(assistant_excerpt) > 600:
         assistant_excerpt = assistant_excerpt[:600].rsplit(" ", 1)[0] + "…"

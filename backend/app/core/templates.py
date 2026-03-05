@@ -4,8 +4,6 @@ import jinja2
 
 def get_jinja_env() -> jinja2.Environment:
     """Initialize a global Jinja2 environment pointing to the app/templates directory."""
-    # current file: backend/app/core/templates.py
-    # app/templates is at backend/app/templates
     base_dir = os.path.dirname(os.path.dirname(__file__))
     template_dir = os.path.join(base_dir, "templates")
 
