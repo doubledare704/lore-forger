@@ -5,6 +5,8 @@ from typing import AsyncIterator
 from fastapi import Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
+from fastapi.staticfiles import StaticFiles
+import os
 
 from backend.app.api.router import api_router
 from backend.app.api.schemas import StreamRequest
@@ -55,3 +57,9 @@ async def stream(
             "X-Accel-Buffering": "no",
         },
     )
+
+
+# Serve frontend static files if the directory exists
+static_dir = os.path.join(os.path.dirname(__file__), "static")
+if os.path.exists(static_dir):
+    app.mount("/", StaticFiles(directory=static_dir, html=True), name="frontend")
