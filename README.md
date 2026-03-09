@@ -95,3 +95,22 @@ This will set it as an environment variable in the Cloud Run service.
        --set-secrets=GOOGLE_API_KEY=GOOGLE_API_KEY:latest \
        --region us-central1
    ```
+
+## 🏗️ Architecture Diagram
+
+```mermaid
+flowchart TD
+    User[Player / Browser] --> CR[Cloud Run Service]
+    CR --> FE[SvelteKit frontend\nserved as static files]
+    CR --> API[FastAPI backend\nREST + SSE + presentation routes]
+    API --> FS[Google Firestore\nsessions + world state]
+    API --> AI[Gemini / Imagen APIs\nlore + image generation]
+    API --> Decks[Presentation output\nReveal.js-style HTML decks]
+    Build[Cloud Build + Dockerfile] --> CR
+    FE -->|calls /api and /presentations| API
+    API -->|streams tokens via SSE| User
+```
+
+## Architecture image
+![Architecture diagram](arch.svg)
+
