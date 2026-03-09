@@ -3,41 +3,10 @@ from __future__ import annotations
 from fastapi import APIRouter, Depends, Response
 from fastapi.responses import HTMLResponse
 
-from backend.app.core.templates import render_template
 from backend.app.services import get_presentation_service, PresentationService
 
 
 router = APIRouter(prefix="/presentations")
-
-
-@router.get("/demo", response_class=HTMLResponse)
-def demo_presentation() -> HTMLResponse:
-    """Minimal Reveal.js demo deck."""
-
-    html_content = render_template(
-        "presentation.html",
-        title="LoreForge — Demo Deck",
-        heading="LoreForge",
-        subtitle="Reveal.js demo deck (served by FastAPI)",
-        slides=[
-            {
-                "title": "World Pillars",
-                "bullets": [
-                    "Tone: candlelit mystery",
-                    "Conflict: ancient oaths awakening",
-                    "Play loop: explore → bargain → unveil",
-                ],
-            },
-            {
-                "title": "Next",
-                "bullets": [
-                    "Step 5.2 will generate slides from the agent and open them automatically."
-                ],
-            },
-        ],
-    )
-
-    return HTMLResponse(content=html_content)
 
 
 @router.get("/{presentation_id}", response_class=HTMLResponse)

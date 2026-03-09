@@ -20,6 +20,11 @@ env/
 *.swo
 *~
 
+# Frontend
+node_modules/
+frontend/build/
+frontend/.svelte-kit/
+
 # Python Cache
 __pycache__/
 *.pyc

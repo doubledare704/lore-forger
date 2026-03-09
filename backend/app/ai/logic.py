@@ -14,6 +14,16 @@ DEFAULT_NEGATIVE_PROMPT = (
     "website, URL, UI, HUD, menu, digital lettering, floating letters, typography"
 )
 
+
+def _text_artifact_guardrail() -> str:
+    """Shared prompt guardrail to reduce readable text artifacts in generated images."""
+
+    return (
+        "No readable text of any kind. "
+        f"Avoid entirely: {DEFAULT_NEGATIVE_PROMPT}, numbers, runes, sigils, signage, banners, maps, scrolls, book pages, inscriptions. "
+        "If any such element would normally appear in-scene, make it blank, obscured, or abstract and unreadable. "
+    )
+
 STATE_DERIVATION_SYSTEM_PROMPT = (
     "You are LoreForge's world-state steward.\n"
     "Update and maintain an OPINIONATED campaign state and inventory for an RPG.\n\n"
@@ -55,13 +65,14 @@ def build_image_prompt(*, user_prompt: str, assistant_text: str) -> str:
     return (
         "Create a single cinematic fantasy illustration. "
         "Atmospheric, dramatic lighting, high detail. "
-        "NO OVERLAID TEXT, NO LETTERS, NO WORDS, NO UI, NO LOGOS. "
-        "Clean cinematic landscape or interior view. "
+        "Use environmental storytelling only; never present the image as a poster, title card, labeled map, manuscript, or UI screen. "
+        + _text_artifact_guardrail()
+        + "Clean cinematic landscape or interior view. "
         "The image should visually depict the following scene elements, but do NOT include any text overlays: "
         f"Prompt: {user_prompt.strip()}\n"
         f"Description: {assistant_excerpt}\n"
-        "Ensure no digital overlays, watermarks, or typography are present. "
-        "If a building or structure naturally contains a sign or weathered inscription, it must be environmental and not an overlay."
+        "Focus on characters, architecture, atmosphere, terrain, and props rather than written artifacts. "
+        "Ensure no digital overlays, watermarks, typography, readable glyphs, or readable magical symbols are present."
     )
 
 
@@ -79,13 +90,15 @@ def build_deck_image_prompt(*, deck_title: str, slide: dict[str, Any]) -> str:
     return (
         "Create a single cinematic fantasy illustration as a clean background plate for a presentation slide. "
         "Atmospheric, dramatic lighting, high detail. "
-        "STRICTLY NO OVERLAID TEXT, NO LETTERS, NO WORDS, NO UI. "
-        "Clean scenic view without any digital typography or watermarks. "
+        "This must read as background art only, not a poster, title card, infographic, labeled map, book page, or UI screen. "
+        "Prefer a simple composition with visual breathing room for slide content. "
+        + _text_artifact_guardrail()
+        + "Clean scenic view without digital typography or watermarks. "
         "The image should visually represent these themes: "
         f"Context: {deck_title}, {title}. "
         + (f"Kind: {kind}. " if kind else "")
         + (f"Details: {bullets_txt}" if bullets_txt else "")
-        + "\nEnvironmental writing on buildings or structures is acceptable if it looks natural and weathered, but NO digital text overlays."
+        + "\nAvoid books, scrolls, signs, banners, inscribed stone, readable runes, logos, and any text-bearing object. If those elements appear, they must remain unreadable."
     )
 
 
