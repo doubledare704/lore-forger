@@ -111,6 +111,3 @@ flowchart TD
     API -->|streams tokens via SSE| User
 ```
 
-## Architecture image
-![Architecture diagram](arch.svg)
-
